@@ -209,7 +209,7 @@ function removeItem(idx) {
     renderCartPage();
 }
 
-/* helper — look up hex for a color name from cached products */
+/* helper — get color hex from cached products for cart color dot */
 function getColorHex(colorName) {
     try {
         const cached = JSON.parse(localStorage.getItem("claxxic_products") || "[]");
@@ -242,6 +242,7 @@ function updateSummary(cart) {
 
     if (waBtn) {
         if (!addr) {
+            // No address — block WhatsApp button
             waBtn.style.opacity       = "0.45";
             waBtn.style.pointerEvents = "none";
             waBtn.style.cursor        = "not-allowed";
@@ -252,6 +253,7 @@ function updateSummary(cart) {
             waBtn.style.cursor        = "pointer";
             if (noteEl) noteEl.style.display = "none";
 
+            // Rich WhatsApp message with color + image + address
             let msg = "🛒 *New Order — Claxxic India*\n\n";
             msg += "👟 *Items Ordered:*\n";
             cart.forEach((item, i) => {
@@ -264,7 +266,7 @@ function updateSummary(cart) {
                 if (item.image) {
                     const imgUrl = item.image.startsWith("http")
                         ? item.image
-                        : `${window.location.origin}${window.location.pathname.replace(/\/[^\/]*$/, "/")}${item.image}`;
+                        : `${window.location.origin}${item.image}`;
                     msg += `   🖼 Image: ${imgUrl}\n`;
                 }
             });
@@ -279,8 +281,34 @@ function updateSummary(cart) {
             if (addr.landmark) msg += `Landmark: ${addr.landmark}\n`;
             msg += `\nPlease confirm my order! 🙏`;
 
-            waBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+            const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+            waBtn.href = waUrl;
+
+            // Also intercept click to save order to database first
+            waBtn.onclick = async function(e) {
+                e.preventDefault();
+                await saveOrderToServer(cart, addr, subtotal);
+                window.open(waUrl, "_blank");
+            };
         }
+    }
+}
+
+
+/* =================================================
+   SAVE ORDER TO SERVER (Phase 2)
+   Called when customer clicks Order via WhatsApp
+================================================= */
+async function saveOrderToServer(cart, addr, total) {
+    try {
+        await fetch("/api/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ address: addr, items: cart, total })
+        });
+    } catch (e) {
+        console.warn("Could not save order to server:", e);
+        // Still let WhatsApp open even if server save fails
     }
 }
 
@@ -472,7 +500,6 @@ function renderBrandTiles() {
 async function fetchProducts() {
     const res  = await fetch("/api/products");
     const data = await res.json();
-    // Cache for color hex lookup in cart
     try { localStorage.setItem("claxxic_products", JSON.stringify(data)); } catch {}
     return data;
 }

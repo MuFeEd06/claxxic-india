@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login — Claxxic India</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #e8f5fd 0%, #f4f8fb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 40px rgba(43,159,216,0.15);
+            text-align: center;
+        }
+        .login-logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2B9FD8;
+            margin-bottom: 6px;
+        }
+        .login-sub {
+            font-size: 0.88rem;
+            color: #9badb8;
+            margin-bottom: 36px;
+        }
+        label {
+            display: block;
+            text-align: left;
+            font-size: 0.82rem;
+            color: #5a6a7a;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        input[type="password"] {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid #d0e6f5;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+            color: #1a1a2e;
+            background: #f4f8fb;
+        }
+        input[type="password"]:focus { border-color: #2B9FD8; background: #fff; }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #2B9FD8;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .login-btn:hover { background: #1a7ab0; transform: translateY(-1px); }
+        .error {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            color: #e53e3e;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+        .lock-icon { font-size: 2.5rem; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="lock-icon">🔐</div>
+        <div class="login-logo">Claxxic India</div>
+        <div class="login-sub">Admin Dashboard</div>
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST">
+            <label>Admin Password</label>
+            <input type="password" name="password" placeholder="Enter password" autofocus required>
+            <button type="submit" class="login-btn">Sign In</button>
+        </form>
+    </div>
+</body>
+</html>

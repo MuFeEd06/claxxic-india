@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Claxxic India</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f8fb;
+            color: #1a1a2e;
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        .admin-header {
+            background: #fff;
+            border-bottom: 1px solid #d0e6f5;
+            padding: 0 5%;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(43,159,216,0.08);
+        }
+        .admin-brand { font-size: 1.3rem; font-weight: 800; color: #2B9FD8; }
+        .admin-brand span { color: #1a1a2e; font-weight: 400; font-size: 0.9rem; margin-left: 10px; }
+        .logout-btn {
+            padding: 7px 18px;
+            border: 1.5px solid #d0e6f5;
+            border-radius: 20px;
+            background: none;
+            color: #5a6a7a;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover { border-color: #e53e3e; color: #e53e3e; }
+
+        /* ── MAIN ── */
+        .admin-main { max-width: 1300px; margin: 0 auto; padding: 32px 5% 80px; }
+
+        /* ── STAT CARDS ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid #d0e6f5;
+            box-shadow: 0 2px 12px rgba(43,159,216,0.06);
+        }
+        .stat-card .label { font-size: 0.75rem; color: #9badb8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+        .stat-card .value { font-size: 1.8rem; font-weight: 800; color: #1a1a2e; }
+        .stat-card.revenue .value { color: #2B9FD8; }
+        .stat-card.pending .value { color: #f6ad55; }
+        .stat-card.confirmed .value { color: #4299e1; }
+        .stat-card.shipped .value { color: #9f7aea; }
+        .stat-card.delivered .value { color: #48bb78; }
+
+        /* ── FILTERS ── */
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1.5px solid #d0e6f5;
+            background: #fff;
+            color: #5a6a7a;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: #2B9FD8;
+            border-color: #2B9FD8;
+            color: #fff;
+        }
+
+        /* ── ORDERS TABLE ── */
+        .orders-wrap {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #d0e6f5;
+            box-shadow: 0 2px 12px rgba(43,159,216,0.06);
+            overflow: hidden;
+        }
+        .orders-wrap h2 {
+            padding: 20px 24px 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-bottom: 1px solid #eaf3fa;
+            color: #1a1a2e;
+        }
+
+        /* ── ORDER CARD ── */
+        .order-card {
+            border-bottom: 1px solid #eaf3fa;
+            padding: 20px 24px;
+            transition: background 0.15s;
+        }
+        .order-card:last-child { border-bottom: none; }
+        .order-card:hover { background: #f9fcff; }
+
+        .order-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .order-id { font-size: 0.78rem; color: #9badb8; margin-bottom: 4px; }
+        .order-customer { font-size: 1rem; font-weight: 700; color: #1a1a2e; }
+        .order-phone { font-size: 0.85rem; color: #5a6a7a; margin-top: 2px; }
+        .order-address { font-size: 0.82rem; color: #9badb8; margin-top: 4px; line-height: 1.5; }
+        .order-date { font-size: 0.78rem; color: #9badb8; white-space: nowrap; }
+        .order-total { font-size: 1.2rem; font-weight: 800; color: #2B9FD8; }
+
+        /* Status badge */
+        .status-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .status-Pending   { background: #fffbeb; color: #d69e2e; border: 1px solid #fbd38d; }
+        .status-Confirmed { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+        .status-Shipped   { background: #faf5ff; color: #6b46c1; border: 1px solid #d6bcfa; }
+        .status-Delivered { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+        .status-Cancelled { background: #fff5f5; color: #c53030; border: 1px solid #fed7d7; }
+
+        /* Items list */
+        .order-items {
+            margin-top: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .order-item-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f4f8fb;
+            border: 1px solid #d0e6f5;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.82rem;
+        }
+        .order-item-img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            border-radius: 4px;
+            background: #fff;
+        }
+        .order-item-info { line-height: 1.4; }
+        .order-item-name { font-weight: 600; color: #1a1a2e; }
+        .order-item-meta { color: #9badb8; font-size: 0.76rem; }
+
+        /* Controls row */
+        .order-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+        .status-select {
+            padding: 7px 12px;
+            border: 1.5px solid #d0e6f5;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: #f4f8fb;
+            color: #1a1a2e;
+            outline: none;
+            cursor: pointer;
+        }
+        .status-select:focus { border-color: #2B9FD8; }
+        .save-status-btn {
+            padding: 7px 18px;
+            background: #2B9FD8;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .save-status-btn:hover { background: #1a7ab0; }
+        .save-status-btn.saved { background: #48bb78; }
+
+        .notes-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 7px 12px;
+            border: 1.5px solid #d0e6f5;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: #f4f8fb;
+            color: #1a1a2e;
+            outline: none;
+        }
+        .notes-input:focus { border-color: #2B9FD8; }
+        .save-notes-btn {
+            padding: 7px 14px;
+            background: #eaf3fa;
+            color: #2B9FD8;
+            border: 1.5px solid #2B9FD8;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .save-notes-btn:hover { background: #2B9FD8; color: #fff; }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9badb8;
+        }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+        .empty-state p { font-size: 1rem; }
+
+        /* ── TOAST ── */
+        #toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1a1a2e;
+            color: #fff;
+            padding: 11px 22px;
+            border-radius: 30px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            z-index: 9999;
+            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            pointer-events: none;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .order-header { flex-direction: column; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="admin-header">
+    <div class="admin-brand">
+        Claxxic India <span>Admin Dashboard</span>
+    </div>
+    <a href="/admin/logout" class="logout-btn">Sign Out</a>
+</header>
+
+<main class="admin-main">
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="label">Total Orders</div>
+            <div class="value">{{ total_orders }}</div>
+        </div>
+        <div class="stat-card revenue">
+            <div class="label">Total Revenue</div>
+            <div class="value">{{ total_rev }}</div>
+        </div>
+        <div class="stat-card pending">
+            <div class="label">Pending</div>
+            <div class="value">{{ pending }}</div>
+        </div>
+        <div class="stat-card shipped">
+            <div class="label">Shipped</div>
+            <div class="value">{{ shipped }}</div>
+        </div>
+        <div class="stat-card delivered">
+            <div class="label">Delivered</div>
+            <div class="value">{{ delivered }}</div>
+        </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters">
+        <a href="/admin/dashboard?status=all"       class="filter-btn {% if status_filter == 'all'       %}active{% endif %}">All</a>
+        <a href="/admin/dashboard?status=Pending"   class="filter-btn {% if status_filter == 'Pending'   %}active{% endif %}">🟡 Pending</a>
+        <a href="/admin/dashboard?status=Confirmed" class="filter-btn {% if status_filter == 'Confirmed' %}active{% endif %}">🔵 Confirmed</a>
+        <a href="/admin/dashboard?status=Shipped"   class="filter-btn {% if status_filter == 'Shipped'   %}active{% endif %}">🟣 Shipped</a>
+        <a href="/admin/dashboard?status=Delivered" class="filter-btn {% if status_filter == 'Delivered' %}active{% endif %}">🟢 Delivered</a>
+        <a href="/admin/dashboard?status=Cancelled" class="filter-btn {% if status_filter == 'Cancelled' %}active{% endif %}">🔴 Cancelled</a>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="orders-wrap">
+        <h2>Orders
+            {% if status_filter != 'all' %} — {{ status_filter }}{% endif %}
+            ({{ orders | length }})
+        </h2>
+
+        {% if orders %}
+            {% for order in orders %}
+            <div class="order-card" id="order-{{ order.id }}">
+
+                <div class="order-header">
+                    <div>
+                        <div class="order-id">#{{ "%04d" % order.id }} · {{ order.created_at.strftime("%d %b %Y, %I:%M %p") }}</div>
+                        <div class="order-customer">{{ order.name }}</div>
+                        <div class="order-phone">📞 {{ order.phone }}</div>
+                        <div class="order-address">
+                            📍 {{ order.line1 }}{% if order.line2 %}, {{ order.line2 }}{% endif %},
+                            {{ order.city }}, {{ order.state }} — {{ order.pin }}
+                            {% if order.landmark %}<br>Near: {{ order.landmark }}{% endif %}
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="order-total">₹{{ "{:,}".format(order.total | int) }}</div>
+                        <div style="margin-top:6px;">
+                            <span class="status-badge status-{{ order.status }}">{{ order.status }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ITEMS -->
+                <div class="order-items">
+                    {% for item in order.items %}
+                    <div class="order-item-chip">
+                        <img class="order-item-img"
+                             src="{{ item.image or '' }}"
+                             alt="{{ item.name }}"
+                             onerror="this.src='https://placehold.co/36x36/eaf3fa/2B9FD8?text=👟'">
+                        <div class="order-item-info">
+                            <div class="order-item-name">{{ item.name }}</div>
+                            <div class="order-item-meta">
+                                {{ item.size }}{% if item.color %} · {{ item.color }}{% endif %}
+                                · Qty {{ item.qty }} · ₹{{ "{:,}".format((item.price * item.qty) | int) }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- CONTROLS -->
+                <div class="order-controls">
+                    <select class="status-select" id="status-{{ order.id }}">
+                        {% for s in ["Pending","Confirmed","Shipped","Delivered","Cancelled"] %}
+                        <option value="{{ s }}" {% if order.status == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="save-status-btn" onclick="saveStatus({{ order.id }})">Update Status</button>
+
+                    <input  class="notes-input"
+                            id="notes-{{ order.id }}"
+                            placeholder="Add a note..."
+                            value="{{ order.notes or '' }}">
+                    <button class="save-notes-btn" onclick="saveNotes({{ order.id }})">Save Note</button>
+                </div>
+
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="icon">📦</div>
+                <p>No orders found{% if status_filter != 'all' %} with status "{{ status_filter }}"{% endif %}.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+    function showToast(msg, success=true) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.background = success ? "#1a7ab0" : "#e53e3e";
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2500);
+    }
+
+    async function saveStatus(orderId) {
+        const select = document.getElementById("status-" + orderId);
+        const btn    = select.nextElementSibling;
+        const status = select.value;
+
+        try {
+            const res = await fetch(`/api/orders/${orderId}/status`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status })
+            });
+            const data = await res.json();
+            if (data.success) {
+                btn.textContent = "✓ Saved";
+                btn.classList.add("saved");
+                setTimeout(() => { btn.textContent = "Update Status"; btn.classList.remove("saved"); }, 2000);
+
+                // Update badge in UI without reload
+                const card   = document.getElementById("order-" + orderId);
+                const badge  = card.querySelector(".status-badge");
+                badge.className = "status-badge status-" + status;
+                badge.textContent = status;
+                showToast(`Order #${String(orderId).padStart(4,"0")} → ${status}`);
+            } else {
+                showToast("Failed to update", false);
+            }
+        } catch (e) {
+            showToast("Error: " + e.message, false);
+        }
+    }
+
+    async function saveNotes(orderId) {
+        const notes = document.getElementById("notes-" + orderId).value;
+        try {
+            const res = await fetch(`/api/orders/${orderId}/notes`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ notes })
+            });
+            const data = await res.json();
+            if (data.success) showToast("Note saved ✓");
+            else showToast("Failed to save note", false);
+        } catch (e) {
+            showToast("Error: " + e.message, false);
+        }
+    }
+</script>
+
+</body>
+</html>
