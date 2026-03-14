@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Claxxic India — Premium Sneakers{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/meshoptimizer@0.18.1/meshopt_decoder.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/GLTFLoader.js"></script>
+{% endblock %}
+
+{% block content %}
+
+    <header>
+        <div class="logo-container">
+            <h1 class="logo">Claxxic India</h1>
+            <img src="{{ url_for('static', filename='logo/logo.png') }}" alt="Sneaker Logo">
+        </div>
+
+        <input type="checkbox" id="menu-toggle" class="menu-toggle">
+        <label for="menu-toggle" class="hamburger">
+            <span></span><span></span><span></span>
+        </label>
+
+        <nav class="nav-menu">
+            <a href="/">Home</a>
+            <a href="/#collections">Collections</a>
+            <a href="/#shop">Shop</a>
+            <a href="#">Contact</a>
+        </nav>
+
+        <div class="floating-cart" onclick="window.location.href='/cart'" style="cursor:pointer">
+            🛒 <span id="cart-count">0</span>
+        </div>
+    </header>
+
+    <section class="hero fade-in">
+        <div class="hero-layout">
+            <div class="hero-text left">
+                <h2>Ultra Comfort</h2>
+                <p>Breathable mesh designed for long wear.</p>
+                <h2>Lightweight</h2>
+                <p>Ultra-light foam cushioning.</p>
+            </div>
+            <div id="sneaker-container"></div>
+            <div class="hero-text right">
+                <h2>Smart Design</h2>
+                <p>Inspired by modern sportswear.</p>
+                <h2>Maximum Grip</h2>
+                <p>Advanced traction outsole.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="collections-section fade-in" id="collections">
+        <h2 class="section-title">Shop by Brand</h2>
+        <div class="brand-tiles-grid" id="brand-tiles-grid"></div>
+    </section>
+
+    <section id="shop" class="shop-section fade-in">
+        <h2 class="section-title">Trending Shoes</h2>
+        <div class="product-grid" id="main-product-grid"></div>
+    </section>
+
+{% endblock %}

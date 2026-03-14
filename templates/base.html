@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}Claxxic India{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <a href="https://wa.me/918606466821" class="whatsapp-btn" target="_blank" aria-label="Chat on WhatsApp">
+        <img src="{{ url_for('static', filename='logo/whatsapp.png') }}" alt="WhatsApp">
+    </a>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        <div class="footer-grid">
+            <div>
+                <h2 class="logo">Claxxic India</h2>
+                <p>Quality sneakers delivered worldwide.</p>
+            </div>
+            <div>
+                <h3>Support</h3>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Refund Policy</a>
+                <a href="#">Shipping</a>
+            </div>
+            <div>
+                <h3>Newsletter</h3>
+                <input type="email" placeholder="Your email">
+                <button>Subscribe</button>
+            </div>
+        </div>
+        <p class="copyright">© 2026 Claxxic India</p>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+    {% block scripts %}{% endblock %}
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

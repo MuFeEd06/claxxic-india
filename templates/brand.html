@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Brand — Claxxic India{% endblock %}
+
+{% block head %}
+<style>
+    .brand-hero {
+        padding: 60px 5% 30px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        border-bottom: 1px solid var(--glass-border);
+        background: var(--surface);
+    }
+    .brand-hero-monogram {
+        width: 90px; height: 90px; border-radius: 18px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.2rem; font-weight: 900; flex-shrink: 0;
+        padding: 14px;
+    }
+    .brand-hero-info h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 6px; }
+    .brand-hero-info p  { color: var(--text-muted); font-size: 0.95rem; }
+    .brand-hero-info .count { color: var(--primary); font-weight: 600; }
+    .back-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        color: var(--text-muted); text-decoration: none;
+        font-size: 0.9rem; margin: 24px 5% 0; transition: color 0.3s;
+    }
+    .back-btn:hover { color: var(--primary); }
+    .back-btn svg { width: 16px; height: 16px; }
+    .brand-products-section { padding: 10px 5% 80px; }
+    .brand-products-section .section-title { margin: 30px 0 10px; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <header>
+        <div class="logo-container">
+            <h1 class="logo">Claxxic India</h1>
+            <img src="{{ url_for('static', filename='logo/logo.png') }}" alt="Sneaker Logo">
+        </div>
+        <input type="checkbox" id="menu-toggle" class="menu-toggle">
+        <label for="menu-toggle" class="hamburger">
+            <span></span><span></span><span></span>
+        </label>
+        <nav class="nav-menu">
+            <a href="/">Home</a>
+            <a href="/#collections">Collections</a>
+            <a href="/#shop">Shop</a>
+            <a href="#">Contact</a>
+        </nav>
+        <div class="floating-cart" onclick="window.location.href='/cart'" style="cursor:pointer">
+            🛒 <span id="cart-count">0</span>
+        </div>
+    </header>
+
+    <a href="/#collections" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back to Brands
+    </a>
+
+    <div class="brand-hero">
+        <div class="brand-hero-monogram" id="brand-monogram"></div>
+        <div class="brand-hero-info">
+            <h1 id="brand-title"></h1>
+            <p><span class="count" id="brand-count"></span> styles available</p>
+        </div>
+    </div>
+
+    <section class="brand-products-section">
+        <h2 class="section-title" id="brand-section-title"></h2>
+        <div class="product-grid" id="brand-product-grid"></div>
+    </section>
+
+{% endblock %}

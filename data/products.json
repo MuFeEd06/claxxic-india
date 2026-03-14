@@ -1,0 +1,540 @@
+[
+  {
+    "id": 1,
+    "name": "Air Jordan 1 High OG",
+    "brand": "Nike",
+    "price": 18500,
+    "image": "shoes/nike/nike-air-jordan-1-high.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": "trending",
+    "colors": [
+      { "name": "Black/Red",   "hex": "#1a1a1a", "price": 18500, "image": "shoes/nike/nike-air-jordan-1-high.jpg" },
+      { "name": "Royal Blue",  "hex": "#1a4faa", "price": 19500, "image": "shoes/nike/nike-air-jordan-1-high-royal.jpg" },
+      { "name": "Chicago Red", "hex": "#c8102e", "price": 21000, "image": "shoes/nike/nike-air-jordan-1-high-chicago.jpg" },
+      { "name": "White",       "hex": "#f5f5f5", "price": 17500, "image": "shoes/nike/nike-air-jordan-1-high-white.jpg" }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Nike Dunk Low Retro",
+    "brand": "Nike",
+    "price": 12000,
+    "image": "shoes/nike/nike-dunk-low.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": "trending",
+    "colors": [
+      { "name": "Panda",          "hex": "#1a1a1a", "price": 12000, "image": "shoes/nike/nike-dunk-low.jpg" },
+      { "name": "White/Grey",     "hex": "#d0d0d0", "price": 11000, "image": "shoes/nike/nike-dunk-low-grey.jpg" },
+      { "name": "University Red", "hex": "#cc0000", "price": 13500, "image": "shoes/nike/nike-dunk-low-red.jpg" },
+      { "name": "Green",          "hex": "#2d7a3a", "price": 12500, "image": "shoes/nike/nike-dunk-low-green.jpg" }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Nike Air Max 90",
+    "brand": "Nike",
+    "price": 13500,
+    "image": "shoes/nike/nike-air-max-90.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": "",
+    "colors": [
+      { "name": "White",    "hex": "#f5f5f5", "price": 13500, "image": "shoes/nike/nike-air-max-90.jpg" },
+      { "name": "Black",    "hex": "#111111", "price": 14000, "image": "shoes/nike/nike-air-max-90-black.jpg" },
+      { "name": "Infrared", "hex": "#ff3a00", "price": 15500, "image": "shoes/nike/nike-air-max-90-infrared.jpg" }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Nike Air Force 1 Low",
+    "brand": "Nike",
+    "price": 9500,
+    "image": "shoes/nike/nike-air-force-1.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 5,
+    "name": "Nike React Infinity Run",
+    "brand": "Nike",
+    "price": 11000,
+    "image": "shoes/nike/nike-react-infinity.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 6,
+    "name": "Nike ZoomX Vaporfly",
+    "brand": "Nike",
+    "price": 16000,
+    "image": "shoes/nike/nike-zoomx-vaporfly.jpg",
+    "sizes": ["UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 7,
+    "name": "Adidas Yeezy Boost 350 V2",
+    "brand": "Adidas",
+    "price": 22000,
+    "image": "shoes/adidas/adidas-yeezy-350.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": "trending"
+  },
+  {
+    "id": 8,
+    "name": "Adidas Superstar Classic",
+    "brand": "Adidas",
+    "price": 7500,
+    "image": "shoes/adidas/adidas-superstar.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 9,
+    "name": "Adidas Stan Smith",
+    "brand": "Adidas",
+    "price": 6500,
+    "image": "shoes/adidas/adidas-stan-smith.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 10,
+    "name": "Adidas Ultraboost 22",
+    "brand": "Adidas",
+    "price": 14000,
+    "image": "shoes/adidas/adidas-ultraboost-22.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 11,
+    "name": "Adidas Forum Low",
+    "brand": "Adidas",
+    "price": 8500,
+    "image": "shoes/adidas/adidas-forum-low.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 12,
+    "name": "Adidas NMD R1",
+    "brand": "Adidas",
+    "price": 10500,
+    "image": "shoes/adidas/adidas-nmd-r1.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 13,
+    "name": "New Balance 550 White",
+    "brand": "New Balance",
+    "price": 14500,
+    "image": "shoes/newbalance/nb-550-white.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": "trending"
+  },
+  {
+    "id": 14,
+    "name": "New Balance 990v5",
+    "brand": "New Balance",
+    "price": 19000,
+    "image": "shoes/newbalance/nb-990v5.jpg",
+    "sizes": ["UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 15,
+    "name": "New Balance 574 Core",
+    "brand": "New Balance",
+    "price": 8500,
+    "image": "shoes/newbalance/nb-574.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 16,
+    "name": "New Balance 2002R",
+    "brand": "New Balance",
+    "price": 12500,
+    "image": "shoes/newbalance/nb-2002r.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 17,
+    "name": "Vans Old Skool Black",
+    "brand": "Vans",
+    "price": 5500,
+    "image": "shoes/vans/vans-old-skool.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": "trending"
+  },
+  {
+    "id": 18,
+    "name": "Vans Sk8-Hi Classic",
+    "brand": "Vans",
+    "price": 6500,
+    "image": "shoes/vans/vans-sk8-hi.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 19,
+    "name": "Vans Authentic Lo Pro",
+    "brand": "Vans",
+    "price": 4500,
+    "image": "shoes/vans/vans-authentic.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 20,
+    "name": "Vans Slip-On Checkerboard",
+    "brand": "Vans",
+    "price": 4000,
+    "image": "shoes/vans/vans-slip-on.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 21,
+    "name": "Converse Chuck 70 Hi",
+    "brand": "Converse",
+    "price": 6000,
+    "image": "shoes/converse/converse-chuck70-hi.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": "trending"
+  },
+  {
+    "id": 22,
+    "name": "Converse All Star Low",
+    "brand": "Converse",
+    "price": 4500,
+    "image": "shoes/converse/converse-all-star-low.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 23,
+    "name": "Converse Run Star Hike",
+    "brand": "Converse",
+    "price": 8500,
+    "image": "shoes/converse/converse-run-star.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 24,
+    "name": "Puma RS-X Bold",
+    "brand": "Puma",
+    "price": 8500,
+    "image": "shoes/puma/puma-rs-x.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": "trending"
+  },
+  {
+    "id": 25,
+    "name": "Puma Suede Classic",
+    "brand": "Puma",
+    "price": 5500,
+    "image": "shoes/puma/puma-suede.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 26,
+    "name": "Puma Mayze Leather",
+    "brand": "Puma",
+    "price": 6500,
+    "image": "shoes/puma/puma-mayze.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 27,
+    "name": "Puma Clyde Court",
+    "brand": "Puma",
+    "price": 7000,
+    "image": "shoes/puma/puma-clyde.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 28,
+    "name": "Reebok Classic Leather",
+    "brand": "Reebok",
+    "price": 5000,
+    "image": "shoes/reebok/reebok-classic.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 29,
+    "name": "Reebok Club C 85",
+    "brand": "Reebok",
+    "price": 5500,
+    "image": "shoes/reebok/reebok-club-c.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 30,
+    "name": "Reebok Freestyle Hi",
+    "brand": "Reebok",
+    "price": 4800,
+    "image": "shoes/reebok/reebok-freestyle.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 31,
+    "name": "Asics Gel-Lyte III",
+    "brand": "Asics",
+    "price": 9000,
+    "image": "shoes/asics/asics-gel-lyte-3.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": "trending"
+  },
+  {
+    "id": 32,
+    "name": "Asics Gel-Nimbus 25",
+    "brand": "Asics",
+    "price": 14000,
+    "image": "shoes/asics/asics-gel-nimbus.jpg",
+    "sizes": ["UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 33,
+    "name": "Asics Gel-Kayano 29",
+    "brand": "Asics",
+    "price": 13500,
+    "image": "shoes/asics/asics-gel-kayano.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 34,
+    "name": "Asics GT-2000 11",
+    "brand": "Asics",
+    "price": 10000,
+    "image": "shoes/asics/asics-gt-2000.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 35,
+    "name": "Skechers D'Lites",
+    "brand": "Sketchers",
+    "price": 4500,
+    "image": "shoes/skechers/skechers-dlites.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 36,
+    "name": "Skechers Go Walk Arch",
+    "brand": "Sketchers",
+    "price": 3500,
+    "image": "shoes/skechers/skechers-gowalk.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 37,
+    "name": "Skechers Max Cushioning",
+    "brand": "Sketchers",
+    "price": 5000,
+    "image": "shoes/skechers/skechers-max-cushioning.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 38,
+    "name": "On Cloud 5",
+    "brand": "On",
+    "price": 15000,
+    "image": "shoes/on/on-cloud-5.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": "trending"
+  },
+  {
+    "id": 39,
+    "name": "On Cloudmonster",
+    "brand": "On",
+    "price": 17500,
+    "image": "shoes/on/on-cloudmonster.jpg",
+    "sizes": ["UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 40,
+    "name": "On Cloudswift 3",
+    "brand": "On",
+    "price": 14500,
+    "image": "shoes/on/on-cloudswift.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 41,
+    "name": "Onitsuka Tiger Mexico 66",
+    "brand": "Onitsuka",
+    "price": 11000,
+    "image": "shoes/onitsuka/onitsuka-mexico-66.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": "trending"
+  },
+  {
+    "id": 42,
+    "name": "Onitsuka Tiger Serrano",
+    "brand": "Onitsuka",
+    "price": 9500,
+    "image": "shoes/onitsuka/onitsuka-serrano.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 43,
+    "name": "Lacoste Lerond Pro",
+    "brand": "Lacoste",
+    "price": 8500,
+    "image": "shoes/lacoste/lacoste-lerond.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 44,
+    "name": "Lacoste Gripshot",
+    "brand": "Lacoste",
+    "price": 7000,
+    "image": "shoes/lacoste/lacoste-gripshot.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 45,
+    "name": "Brooks Ghost 15",
+    "brand": "Brooks",
+    "price": 12000,
+    "image": "shoes/brooks/brooks-ghost-15.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 46,
+    "name": "Brooks Adrenaline GTS 23",
+    "brand": "Brooks",
+    "price": 13500,
+    "image": "shoes/brooks/brooks-adrenaline.jpg",
+    "sizes": ["UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 47,
+    "name": "Timberland 6-Inch Premium",
+    "brand": "Timb",
+    "price": 16000,
+    "image": "shoes/timberland/timb-6inch.jpg",
+    "sizes": ["UK 7","UK 8","UK 9","UK 10"],
+    "tag": "trending"
+  },
+  {
+    "id": 48,
+    "name": "Timberland Euro Sprint Hiker",
+    "brand": "Timb",
+    "price": 14000,
+    "image": "shoes/timberland/timb-euro-sprint.jpg",
+    "sizes": ["UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 49,
+    "name": "Alo Pursuit Sneaker",
+    "brand": "Alo",
+    "price": 18000,
+    "image": "shoes/alo/alo-pursuit.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 50,
+    "name": "Alo Runner Sneaker",
+    "brand": "Alo",
+    "price": 16500,
+    "image": "shoes/alo/alo-runner.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 51,
+    "name": "Brik Classic Low",
+    "brand": "Brik",
+    "price": 4200,
+    "image": "shoes/brik/brik-classic-low.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 52,
+    "name": "Brik Street High",
+    "brand": "Brik",
+    "price": 4800,
+    "image": "shoes/brik/brik-street-high.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 53,
+    "name": "Under Armour Charged Assert 9",
+    "brand": "Under Armour",
+    "price": 5500,
+    "image": "shoes/ua/ua-charged-assert.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+  {
+    "id": 54,
+    "name": "Under Armour HOVR Phantom 3",
+    "brand": "Under Armour",
+    "price": 9500,
+    "image": "shoes/ua/ua-hovr-phantom.jpg",
+    "sizes": ["UK 6","UK 7","UK 8","UK 9","UK 10"],
+    "tag": ""
+  },
+
+  {
+    "id": 55,
+    "name": "LV Trainer Sneaker",
+    "brand": "Louis Vuitton",
+    "price": 85000,
+    "image": "shoes/lv/lv-trainer.jpg",
+    "sizes": ["UK 7","UK 8","UK 9","UK 10"],
+    "tag": "luxury"
+  },
+  {
+    "id": 56,
+    "name": "LV Archlight Sneaker",
+    "brand": "Louis Vuitton",
+    "price": 95000,
+    "image": "shoes/lv/lv-archlight.jpg",
+    "sizes": ["UK 7","UK 8","UK 9","UK 10"],
+    "tag": "luxury"
+  }
+]
