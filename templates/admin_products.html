@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Editor — Claxxic India</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f8fb; color: #1a1a2e; }
+
+        /* ── HEADER ── */
+        .admin-header {
+            background: #fff; border-bottom: 1px solid #d0e6f5;
+            padding: 0 5%; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 200;
+            box-shadow: 0 2px 12px rgba(43,159,216,0.08);
+        }
+        .admin-brand { font-size: 1.3rem; font-weight: 800; color: #2B9FD8; }
+        .header-nav { display: flex; gap: 8px; align-items: center; }
+        .nav-btn {
+            padding: 7px 16px; border-radius: 20px; font-size: 0.85rem;
+            font-weight: 600; cursor: pointer; text-decoration: none;
+            border: 1.5px solid #d0e6f5; background: none; color: #5a6a7a;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover { border-color: #2B9FD8; color: #2B9FD8; }
+        .nav-btn.primary { background: #2B9FD8; color: #fff; border-color: #2B9FD8; }
+        .nav-btn.primary:hover { background: #1a7ab0; }
+        .nav-btn.danger { border-color: #fed7d7; color: #e53e3e; }
+        .nav-btn.danger:hover { background: #e53e3e; color: #fff; }
+
+        /* ── LAYOUT ── */
+        .page { max-width: 1400px; margin: 0 auto; padding: 28px 5% 80px; }
+
+        /* ── OFFER RIBBON EDITOR ── */
+        .offer-panel {
+            background: #fff; border-radius: 16px;
+            border: 1px solid #d0e6f5; padding: 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 2px 12px rgba(43,159,216,0.06);
+        }
+        .panel-title {
+            font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: #9badb8; margin-bottom: 16px;
+        }
+        .offer-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+        .offer-row label { font-size: 0.78rem; color: #5a6a7a; font-weight: 600; display: block; margin-bottom: 5px; }
+        .offer-text-wrap { flex: 1; min-width: 240px; }
+        .offer-text-wrap input {
+            width: 100%; padding: 10px 14px; border: 1.5px solid #d0e6f5;
+            border-radius: 8px; font-size: 0.95rem; outline: none;
+            transition: border-color 0.2s; background: #f4f8fb; color: #1a1a2e;
+        }
+        .offer-text-wrap input:focus { border-color: #2B9FD8; background: #fff; }
+        .color-wrap { display: flex; flex-direction: column; }
+        .color-wrap input[type="color"] {
+            width: 48px; height: 40px; border: 1.5px solid #d0e6f5;
+            border-radius: 8px; cursor: pointer; padding: 2px;
+        }
+        .toggle-wrap { display: flex; flex-direction: column; }
+        .toggle {
+            display: flex; align-items: center; gap: 8px;
+            height: 40px; cursor: pointer;
+        }
+        .toggle input { display: none; }
+        .toggle-track {
+            width: 44px; height: 24px; background: #d0e6f5; border-radius: 12px;
+            position: relative; transition: background 0.2s;
+        }
+        .toggle input:checked + .toggle-track { background: #2B9FD8; }
+        .toggle-track::after {
+            content: ""; position: absolute; top: 3px; left: 3px;
+            width: 18px; height: 18px; background: #fff;
+            border-radius: 50%; transition: left 0.2s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        .toggle input:checked + .toggle-track::after { left: 23px; }
+        .toggle-label { font-size: 0.85rem; font-weight: 600; color: #1a1a2e; }
+        .offer-preview {
+            margin-top: 14px; border-radius: 8px; padding: 10px 20px;
+            text-align: center; font-size: 0.9rem; font-weight: 600;
+            display: none; transition: all 0.3s;
+        }
+        .offer-preview.visible { display: block; }
+
+        /* ── TOOLBAR ── */
+        .toolbar {
+            display: flex; gap: 10px; align-items: center;
+            margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .toolbar-title { font-size: 1.1rem; font-weight: 700; flex: 1; color: #1a1a2e; }
+        .search-box {
+            padding: 9px 14px; border: 1.5px solid #d0e6f5;
+            border-radius: 8px; font-size: 0.88rem; outline: none;
+            background: #fff; color: #1a1a2e; width: 220px;
+            transition: border-color 0.2s;
+        }
+        .search-box:focus { border-color: #2B9FD8; }
+        .brand-filter {
+            padding: 9px 14px; border: 1.5px solid #d0e6f5;
+            border-radius: 8px; font-size: 0.88rem; background: #fff;
+            color: #1a1a2e; outline: none; cursor: pointer;
+        }
+
+        /* ── PRODUCT GRID ── */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        .product-card {
+            background: #fff; border-radius: 14px;
+            border: 1px solid #d0e6f5; overflow: hidden;
+            box-shadow: 0 2px 12px rgba(43,159,216,0.06);
+            transition: box-shadow 0.2s;
+        }
+        .product-card:hover { box-shadow: 0 4px 24px rgba(43,159,216,0.14); }
+        .card-img-wrap { position: relative; background: #f4f8fb; height: 160px; overflow: hidden; }
+        .card-img-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
+        .card-tag {
+            position: absolute; top: 8px; left: 8px;
+            background: #2B9FD8; color: #fff; font-size: 0.68rem;
+            font-weight: 700; padding: 3px 8px; border-radius: 20px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .card-body { padding: 14px 16px; }
+        .card-brand { font-size: 0.7rem; color: #9badb8; text-transform: uppercase; letter-spacing: 1px; }
+        .card-name { font-size: 0.95rem; font-weight: 700; color: #1a1a2e; margin: 3px 0 6px; line-height: 1.3; }
+        .card-price { font-size: 1rem; font-weight: 800; color: #2B9FD8; }
+        .card-colors { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+        .color-dot {
+            width: 14px; height: 14px; border-radius: 50%;
+            border: 1.5px solid rgba(0,0,0,0.12);
+        }
+        .card-sizes { font-size: 0.75rem; color: #9badb8; margin-top: 6px; }
+        .card-actions { display: flex; gap: 8px; padding: 0 16px 14px; }
+        .edit-btn {
+            flex: 1; padding: 8px; background: #eaf3fa; color: #2B9FD8;
+            border: 1.5px solid #2B9FD8; border-radius: 8px; font-size: 0.82rem;
+            font-weight: 700; cursor: pointer; transition: all 0.2s;
+        }
+        .edit-btn:hover { background: #2B9FD8; color: #fff; }
+        .delete-btn {
+            padding: 8px 12px; background: none; color: #e53e3e;
+            border: 1.5px solid #fed7d7; border-radius: 8px; font-size: 0.82rem;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .delete-btn:hover { background: #e53e3e; color: #fff; border-color: #e53e3e; }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45); z-index: 1000;
+            align-items: flex-start; justify-content: center;
+            padding: 40px 16px; overflow-y: auto;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: #fff; border-radius: 20px; width: 100%; max-width: 680px;
+            padding: 32px; position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+        .modal-close {
+            position: absolute; top: 16px; right: 16px;
+            width: 32px; height: 32px; border-radius: 50%;
+            border: none; background: #f4f8fb; cursor: pointer;
+            font-size: 1rem; display: flex; align-items: center; justify-content: center;
+            color: #5a6a7a; transition: background 0.2s;
+        }
+        .modal-close:hover { background: #d0e6f5; }
+        .modal h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 24px; color: #1a1a2e; }
+
+        /* Form */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label { font-size: 0.78rem; font-weight: 700; color: #5a6a7a; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px 13px; border: 1.5px solid #d0e6f5; border-radius: 8px;
+            font-size: 0.9rem; outline: none; background: #f4f8fb; color: #1a1a2e;
+            font-family: inherit; transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: #2B9FD8; background: #fff; }
+        .form-group small { font-size: 0.75rem; color: #9badb8; }
+
+        /* Image upload */
+        .img-upload-area {
+            border: 2px dashed #d0e6f5; border-radius: 10px;
+            padding: 20px; text-align: center; cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            background: #f4f8fb; position: relative;
+        }
+        .img-upload-area:hover { border-color: #2B9FD8; background: #eaf3fa; }
+        .img-upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .img-upload-area .upload-icon { font-size: 1.8rem; margin-bottom: 6px; }
+        .img-upload-area p { font-size: 0.82rem; color: #9badb8; }
+        .img-preview { max-height: 80px; margin-top: 10px; border-radius: 6px; }
+        .img-path-display { font-size: 0.78rem; color: #2B9FD8; margin-top: 6px; word-break: break-all; }
+
+        /* Sizes */
+        .sizes-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+        .size-chip {
+            padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+            border: 1.5px solid #d0e6f5; background: #f4f8fb; color: #5a6a7a;
+            cursor: pointer; transition: all 0.15s; user-select: none;
+        }
+        .size-chip.selected { background: #2B9FD8; color: #fff; border-color: #2B9FD8; }
+
+        /* Color variants */
+        .colors-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+        .color-row {
+            display: grid; grid-template-columns: 40px 1fr 120px 1fr auto;
+            gap: 8px; align-items: center;
+            background: #f4f8fb; border-radius: 8px; padding: 8px 12px;
+            border: 1px solid #d0e6f5;
+        }
+        .color-row input[type="color"] {
+            width: 32px; height: 32px; border: 1.5px solid #d0e6f5;
+            border-radius: 6px; cursor: pointer; padding: 2px; background: none;
+        }
+        .color-row input[type="text"], .color-row input[type="number"] {
+            padding: 7px 10px; border: 1.5px solid #d0e6f5; border-radius: 6px;
+            font-size: 0.82rem; outline: none; background: #fff; color: #1a1a2e;
+        }
+        .color-row input[type="text"]:focus,
+        .color-row input[type="number"]:focus { border-color: #2B9FD8; }
+        .color-img-btn {
+            padding: 6px 10px; background: #eaf3fa; color: #2B9FD8;
+            border: 1.5px solid #2B9FD8; border-radius: 6px; font-size: 0.75rem;
+            font-weight: 600; cursor: pointer; white-space: nowrap; position: relative; overflow: hidden;
+        }
+        .color-img-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .color-img-btn:hover { background: #2B9FD8; color: #fff; }
+        .color-del-btn {
+            width: 28px; height: 28px; border-radius: 6px; border: none;
+            background: #fff5f5; color: #e53e3e; cursor: pointer; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s;
+        }
+        .color-del-btn:hover { background: #e53e3e; color: #fff; }
+        .add-color-btn {
+            padding: 8px 16px; background: none; border: 1.5px dashed #2B9FD8;
+            color: #2B9FD8; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+            cursor: pointer; transition: background 0.2s; margin-top: 4px;
+        }
+        .add-color-btn:hover { background: #eaf3fa; }
+
+        /* Modal footer */
+        .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 28px; padding-top: 20px; border-top: 1px solid #eaf3fa; }
+        .btn-save { padding: 11px 28px; background: #2B9FD8; color: #fff; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        .btn-save:hover { background: #1a7ab0; }
+        .btn-cancel { padding: 11px 20px; background: none; border: 1.5px solid #d0e6f5; color: #5a6a7a; border-radius: 10px; font-size: 0.95rem; cursor: pointer; }
+
+        /* Toast */
+        #toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1a2e; color: #fff; padding: 11px 22px; border-radius: 30px; font-size: 0.88rem; font-weight: 600; z-index: 9999; transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .color-row { grid-template-columns: 32px 1fr 90px; }
+            .color-row input[type="number"], .color-img-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="admin-header">
+    <div class="admin-brand">Claxxic India</div>
+    <div class="header-nav">
+        <a href="/admin/dashboard" class="nav-btn">📦 Orders</a>
+        <button class="nav-btn primary" onclick="openAddModal()">+ Add Product</button>
+        <a href="/admin/logout" class="nav-btn danger">Sign Out</a>
+    </div>
+</header>
+
+<main class="page">
+
+    <!-- OFFER RIBBON PANEL -->
+    <div class="offer-panel">
+        <div class="panel-title">🎁 Offer Ribbon — shown on homepage</div>
+        <div class="offer-row">
+            <div class="offer-text-wrap">
+                <label>Offer Text</label>
+                <input type="text" id="offer-text" placeholder="e.g. 🔥 Flat 20% OFF on all Nike shoes this weekend!"
+                       value="{{ offer.text }}">
+            </div>
+            <div class="color-wrap">
+                <label>BG</label>
+                <input type="color" id="offer-bg" value="{{ offer.bg_color }}">
+            </div>
+            <div class="color-wrap">
+                <label>Text</label>
+                <input type="color" id="offer-fg" value="{{ offer.text_color }}">
+            </div>
+            <div class="toggle-wrap">
+                <label>Active</label>
+                <label class="toggle">
+                    <input type="checkbox" id="offer-active" {% if offer.active %}checked{% endif %}>
+                    <div class="toggle-track"></div>
+                    <span class="toggle-label" id="offer-toggle-label">{{ "ON" if offer.active else "OFF" }}</span>
+                </label>
+            </div>
+            <div style="display:flex;flex-direction:column;justify-content:flex-end;">
+                <button class="nav-btn primary" onclick="saveOffer()">Save Ribbon</button>
+            </div>
+        </div>
+        <div class="offer-preview {% if offer.active and offer.text %}visible{% endif %}"
+             id="offer-preview"
+             style="background:{{ offer.bg_color }};color:{{ offer.text_color }};">
+            {{ offer.text }}
+        </div>
+    </div>
+
+    <!-- PRODUCT TOOLBAR -->
+    <div class="toolbar">
+        <div class="toolbar-title">Products ({{ products | length }})</div>
+        <input class="search-box" type="text" placeholder="🔍  Search products..." id="search-input" oninput="filterProducts()">
+        <select class="brand-filter" id="brand-filter" onchange="filterProducts()">
+            <option value="">All Brands</option>
+            {% for b in brands %}
+            <option value="{{ b }}">{{ b }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- PRODUCT GRID -->
+    <div class="product-grid" id="product-grid">
+        {% for p in products %}
+        <div class="product-card" data-id="{{ p.id }}" data-name="{{ p.name | lower }}" data-brand="{{ p.brand }}">
+            <div class="card-img-wrap">
+                <img src="/static/{{ p.image }}" alt="{{ p.name }}"
+                     onerror="this.src='https://placehold.co/300x160/eaf3fa/2B9FD8?text=No+Image'">
+                {% if p.tag %}<span class="card-tag">{{ p.tag }}</span>{% endif %}
+            </div>
+            <div class="card-body">
+                <div class="card-brand">{{ p.brand }}</div>
+                <div class="card-name">{{ p.name }}</div>
+                <div class="card-price">₹{{ "{:,}".format(p.price) }}</div>
+                {% if p.colors %}
+                <div class="card-colors">
+                    {% for c in p.colors[:6] %}
+                    <div class="color-dot" style="background:{{ c.hex }}" title="{{ c.name }}"></div>
+                    {% endfor %}
+                    {% if p.colors | length > 6 %}
+                    <span style="font-size:0.72rem;color:#9badb8;">+{{ p.colors | length - 6 }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+                <div class="card-sizes">{{ p.sizes | join(", ") }}</div>
+            </div>
+            <div class="card-actions">
+                <button class="edit-btn" onclick="openEditModal({{ p | tojson }})">✏️ Edit</button>
+                <button class="delete-btn" onclick="deleteProduct({{ p.id }}, '{{ p.name }}')">🗑</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</main>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+<div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2 id="modal-title">Add Product</h2>
+
+    <div class="form-grid">
+
+        <div class="form-group">
+            <label>Product Name *</label>
+            <input type="text" id="f-name" placeholder="e.g. Air Jordan 1 High OG">
+        </div>
+
+        <div class="form-group">
+            <label>Brand *</label>
+            <input type="text" id="f-brand" placeholder="e.g. Nike">
+        </div>
+
+        <div class="form-group">
+            <label>Base Price (₹) *</label>
+            <input type="number" id="f-price" placeholder="18500" min="0">
+        </div>
+
+        <div class="form-group">
+            <label>Tag</label>
+            <select id="f-tag">
+                <option value="">None</option>
+                <option value="trending">Trending</option>
+                <option value="new">New</option>
+                <option value="sale">Sale</option>
+                <option value="luxury">Luxury</option>
+            </select>
+        </div>
+
+        <div class="form-group full">
+            <label>Product Image</label>
+            <div class="img-upload-area" id="main-upload-area">
+                <input type="file" id="f-image-file" accept="image/*" onchange="uploadMainImage(this)">
+                <div class="upload-icon">🖼️</div>
+                <p>Click or drag to upload image (JPG, PNG, WEBP · max 5MB)</p>
+                <img id="f-image-preview" class="img-preview" style="display:none">
+            </div>
+            <div class="img-path-display" id="f-image-path"></div>
+            <input type="hidden" id="f-image">
+        </div>
+
+        <div class="form-group full">
+            <label>Sizes</label>
+            <div class="sizes-wrap" id="sizes-wrap">
+                {% for s in ["UK 5","UK 6","UK 7","UK 8","UK 9","UK 10","UK 11","UK 12"] %}
+                <div class="size-chip" onclick="toggleSize(this)" data-size="{{ s }}">{{ s }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group full">
+            <label>Color Variants <span style="color:#9badb8;font-size:0.75rem;">(optional — each can have its own price + image)</span></label>
+            <div class="colors-list" id="colors-list"></div>
+            <button type="button" class="add-color-btn" onclick="addColorRow()">+ Add Color Variant</button>
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-save" onclick="saveProduct()">Save Product</button>
+    </div>
+</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ── STATE ── */
+let editingId   = null;
+let currentBrand = "";
+
+/* ── TOAST ── */
+function showToast(msg, ok=true) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.style.background = ok ? "#1a7ab0" : "#e53e3e";
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+/* ── FILTER / SEARCH ── */
+function filterProducts() {
+    const q      = document.getElementById("search-input").value.toLowerCase();
+    const brand  = document.getElementById("brand-filter").value;
+    document.querySelectorAll(".product-card").forEach(card => {
+        const nameMatch  = card.dataset.name.includes(q);
+        const brandMatch = !brand || card.dataset.brand === brand;
+        card.style.display = (nameMatch && brandMatch) ? "" : "none";
+    });
+}
+
+/* ── OFFER RIBBON ── */
+function updateOfferPreview() {
+    const text    = document.getElementById("offer-text").value;
+    const bg      = document.getElementById("offer-bg").value;
+    const fg      = document.getElementById("offer-fg").value;
+    const active  = document.getElementById("offer-active").checked;
+    const preview = document.getElementById("offer-preview");
+    const label   = document.getElementById("offer-toggle-label");
+
+    label.textContent      = active ? "ON" : "OFF";
+    preview.style.background = bg;
+    preview.style.color      = fg;
+    preview.textContent      = text || "Preview will appear here";
+    preview.classList.toggle("visible", active && !!text);
+}
+
+["offer-text","offer-bg","offer-fg","offer-active"].forEach(id => {
+    document.getElementById(id).addEventListener("input",  updateOfferPreview);
+    document.getElementById(id).addEventListener("change", updateOfferPreview);
+});
+
+async function saveOffer() {
+    const payload = {
+        active:     document.getElementById("offer-active").checked,
+        text:       document.getElementById("offer-text").value.trim(),
+        bg_color:   document.getElementById("offer-bg").value,
+        text_color: document.getElementById("offer-fg").value,
+    };
+    const res  = await fetch("/api/admin/offer", {
+        method: "POST", headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) showToast(payload.active && payload.text ? "✅ Ribbon is now LIVE on homepage!" : "✅ Ribbon saved (currently off)");
+    else showToast("Failed to save", false);
+}
+
+/* ── MODAL OPEN/CLOSE ── */
+function openAddModal() {
+    editingId = null;
+    document.getElementById("modal-title").textContent = "Add New Product";
+    resetForm();
+    document.getElementById("modal-overlay").classList.add("open");
+}
+
+function openEditModal(product) {
+    editingId = product.id;
+    document.getElementById("modal-title").textContent = `Edit — ${product.name}`;
+    resetForm();
+
+    document.getElementById("f-name").value  = product.name;
+    document.getElementById("f-brand").value = product.brand;
+    document.getElementById("f-price").value = product.price;
+    document.getElementById("f-tag").value   = product.tag || "";
+    document.getElementById("f-image").value = product.image || "";
+
+    const pathEl = document.getElementById("f-image-path");
+    if (product.image) {
+        pathEl.textContent = product.image;
+        const prev = document.getElementById("f-image-preview");
+        prev.src = "/static/" + product.image;
+        prev.style.display = "block";
+    }
+
+    // Sizes
+    const sizes = product.sizes || [];
+    document.querySelectorAll(".size-chip").forEach(chip => {
+        chip.classList.toggle("selected", sizes.includes(chip.dataset.size));
+    });
+
+    // Colors
+    (product.colors || []).forEach(c => addColorRow(c));
+
+    currentBrand = product.brand;
+    document.getElementById("modal-overlay").classList.add("open");
+}
+
+function closeModal() {
+    document.getElementById("modal-overlay").classList.remove("open");
+}
+
+function handleOverlayClick(e) {
+    if (e.target === document.getElementById("modal-overlay")) closeModal();
+}
+
+function resetForm() {
+    ["f-name","f-brand","f-price","f-image"].forEach(id => {
+        document.getElementById(id).value = "";
+    });
+    document.getElementById("f-tag").value          = "";
+    document.getElementById("f-image-path").textContent = "";
+    document.getElementById("f-image-preview").style.display = "none";
+    document.querySelectorAll(".size-chip").forEach(c => c.classList.remove("selected"));
+    document.getElementById("colors-list").innerHTML = "";
+    currentBrand = "";
+}
+
+/* ── SIZES ── */
+function toggleSize(el) {
+    el.classList.toggle("selected");
+}
+
+function getSelectedSizes() {
+    return [...document.querySelectorAll(".size-chip.selected")].map(c => c.dataset.size);
+}
+
+/* ── IMAGE UPLOAD — MAIN ── */
+async function uploadMainImage(input) {
+    const file  = input.files[0];
+    const brand = document.getElementById("f-brand").value || "misc";
+    if (!file) return;
+
+    const form = new FormData();
+    form.append("image", file);
+    form.append("brand", brand);
+
+    showToast("Uploading...", true);
+    const res  = await fetch("/api/admin/upload-image", { method: "POST", body: form });
+    const data = await res.json();
+
+    if (data.success) {
+        document.getElementById("f-image").value     = data.path;
+        document.getElementById("f-image-path").textContent = data.path;
+        const prev = document.getElementById("f-image-preview");
+        prev.src   = data.url;
+        prev.style.display = "block";
+        showToast("✅ Image uploaded!");
+    } else {
+        showToast(data.error || "Upload failed", false);
+    }
+}
+
+/* ── COLOR ROWS ── */
+let colorRowId = 0;
+
+function addColorRow(data = {}) {
+    const id   = colorRowId++;
+    const list = document.getElementById("colors-list");
+    const row  = document.createElement("div");
+    row.className = "color-row";
+    row.id        = `color-row-${id}`;
+    row.innerHTML = `
+        <input type="color" value="${data.hex || "#2B9FD8'}"
+               id="cr-hex-${id}" title="Pick color">
+        <input type="text"  value="${data.name || ""}"
+               id="cr-name-${id}" placeholder="Color name">
+        <input type="number" value="${data.price || ""}"
+               id="cr-price-${id}" placeholder="Price (₹)">
+        <label class="color-img-btn" title="${data.image || "No image"}">
+            ${data.image ? "✅ Image" : "📷 Image"}
+            <input type="file" accept="image/*"
+                   onchange="uploadColorImage(this, ${id})">
+        </label>
+        <input type="hidden" id="cr-img-${id}" value="${data.image || ""}">
+        <button type="button" class="color-del-btn"
+                onclick="document.getElementById('color-row-${id}').remove()">✕</button>
+    `;
+    list.appendChild(row);
+}
+
+async function uploadColorImage(input, rowId) {
+    const file  = input.files[0];
+    const brand = document.getElementById("f-brand").value || "misc";
+    if (!file) return;
+
+    const form = new FormData();
+    form.append("image", file);
+    form.append("brand", brand);
+
+    const res  = await fetch("/api/admin/upload-image", { method: "POST", body: form });
+    const data = await res.json();
+
+    if (data.success) {
+        document.getElementById(`cr-img-${rowId}`).value = data.path;
+        input.parentElement.textContent = "✅ Image";
+        showToast("Color image uploaded!");
+    } else {
+        showToast(data.error || "Upload failed", false);
+    }
+}
+
+function getColorRows() {
+    return [...document.querySelectorAll(".color-row")].map(row => {
+        const id = row.id.replace("color-row-", "");
+        return {
+            hex:   document.getElementById(`cr-hex-${id}`)?.value   || "#000",
+            name:  document.getElementById(`cr-name-${id}`)?.value  || "",
+            price: parseInt(document.getElementById(`cr-price-${id}`)?.value) || 0,
+            image: document.getElementById(`cr-img-${id}`)?.value   || "",
+        };
+    }).filter(c => c.name.trim());
+}
+
+/* ── SAVE PRODUCT ── */
+async function saveProduct() {
+    const name  = document.getElementById("f-name").value.trim();
+    const brand = document.getElementById("f-brand").value.trim();
+    const price = parseInt(document.getElementById("f-price").value);
+
+    if (!name || !brand || !price) {
+        showToast("Name, brand and price are required", false); return;
+    }
+
+    const payload = {
+        name, brand, price,
+        tag:    document.getElementById("f-tag").value,
+        image:  document.getElementById("f-image").value,
+        sizes:  getSelectedSizes(),
+        colors: getColorRows(),
+    };
+
+    const url    = editingId ? `/api/admin/products/${editingId}` : "/api/admin/products";
+    const method = editingId ? "PUT" : "POST";
+
+    const res  = await fetch(url, {
+        method, headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (data.success || data.product) {
+        showToast(editingId ? "✅ Product updated!" : "✅ Product added!");
+        closeModal();
+        setTimeout(() => location.reload(), 800);
+    } else {
+        showToast(data.error || "Failed to save", false);
+    }
+}
+
+/* ── DELETE PRODUCT ── */
+async function deleteProduct(id, name) {
+    if (!confirm(`Delete "${name}"?\n\nThis cannot be undone.`)) return;
+
+    const res  = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
+    const data = await res.json();
+
+    if (data.success) {
+        showToast("🗑 Product deleted");
+        document.querySelector(`.product-card[data-id="${id}"]`)?.remove();
+    } else {
+        showToast(data.error || "Failed to delete", false);
+    }
+}
+</script>
+
+</body>
+</html>

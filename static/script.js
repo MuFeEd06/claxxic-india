@@ -904,6 +904,52 @@ function openProduct(id) {
 
 
 /* =================================================
+   OFFER RIBBON
+================================================= */
+async function loadOfferRibbon() {
+    try {
+        const res  = await fetch("/api/offer");
+        const data = await res.json();
+        if (!data.active || !data.text) return;
+
+        const ribbon = document.createElement("div");
+        ribbon.id = "offer-ribbon";
+        ribbon.style.cssText = `
+            background: ${data.bg_color};
+            color: ${data.text_color};
+            text-align: center;
+            padding: 10px 20px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 50;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            animation: ribbonSlide 0.4s ease;
+        `;
+        ribbon.textContent = data.text;
+
+        // Add animation keyframe once
+        if (!document.getElementById("ribbon-style")) {
+            const style = document.createElement("style");
+            style.id = "ribbon-style";
+            style.textContent = `@keyframes ribbonSlide { from { opacity:0; transform:translateY(-100%); } to { opacity:1; transform:translateY(0); } }`;
+            document.head.appendChild(style);
+        }
+
+        // Insert after <header>, before .hero
+        const header = document.querySelector("header");
+        if (header && header.nextSibling) {
+            header.parentNode.insertBefore(ribbon, header.nextSibling);
+        } else {
+            document.body.prepend(ribbon);
+        }
+    } catch (e) {
+        // Silently fail — ribbon is optional
+    }
+}
+
+/* =================================================
    PAGE INITIALIZATION
 ================================================= */
 document.addEventListener("DOMContentLoaded", () => {
@@ -915,7 +961,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const onProduct = !!document.getElementById("product-name");
     const onCart    = !!document.getElementById("cart-items-list");
 
-    if (onHome)    { renderBrandTiles(); renderTrendingShoes(); }
+    if (onHome)    { renderBrandTiles(); renderTrendingShoes(); loadOfferRibbon(); }
     if (onBrand)   renderBrandPage();
     if (onProduct) loadProductPage();
     if (onCart)    renderCartPage();
