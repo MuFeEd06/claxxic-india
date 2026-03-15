@@ -10,7 +10,8 @@ claxxic-india/
 ├── render.yaml               ← Render auto-config
 ├── .gitignore
 ├── data/
-│   └── products.json         ← All your products
+│   └──products.json         ← All your products
+|   |__offer.json 
 ├── templates/                ← HTML pages (Flask format)
 │   ├── base.html
 │   ├── index.html
