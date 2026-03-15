@@ -1,36 +1,66 @@
 """
-Claxxic India — Database Models (Phase 2)
-SQLite via SQLAlchemy — zero setup required
+Claxxic India — Database Models (Supabase / PostgreSQL)
+Uses SQLAlchemy — connect via DATABASE_URL environment variable
 """
 
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import json
 
 db = SQLAlchemy()
+
+
+class Product(db.Model):
+    __tablename__ = "products"
+
+    id      = db.Column(db.Integer, primary_key=True)
+    name    = db.Column(db.String(200), nullable=False)
+    brand   = db.Column(db.String(100), nullable=False)
+    price   = db.Column(db.Integer,     nullable=False)
+    image   = db.Column(db.String(300), nullable=True)
+    tag     = db.Column(db.String(50),  nullable=True, default="")
+    # sizes and colors stored as JSON strings
+    sizes   = db.Column(db.Text, nullable=True, default="[]")
+    colors  = db.Column(db.Text, nullable=True, default="[]")
+
+    def to_dict(self):
+        return {
+            "id":     self.id,
+            "name":   self.name,
+            "brand":  self.brand,
+            "price":  self.price,
+            "image":  self.image,
+            "tag":    self.tag or "",
+            "sizes":  json.loads(self.sizes  or "[]"),
+            "colors": json.loads(self.colors or "[]"),
+        }
+
+
+class Setting(db.Model):
+    __tablename__ = "settings"
+
+    key   = db.Column(db.String(100), primary_key=True)
+    value = db.Column(db.Text, nullable=True)
 
 
 class Order(db.Model):
     __tablename__ = "orders"
 
-    id          = db.Column(db.Integer, primary_key=True)
-    # Customer info
-    name        = db.Column(db.String(100), nullable=False)
-    phone       = db.Column(db.String(20),  nullable=False)
-    # Address
-    line1       = db.Column(db.String(120), nullable=False)
-    line2       = db.Column(db.String(120), nullable=True)
-    city        = db.Column(db.String(60),  nullable=False)
-    state       = db.Column(db.String(60),  nullable=False)
-    pin         = db.Column(db.String(12),  nullable=False)
-    landmark    = db.Column(db.String(100), nullable=True)
-    # Order info
-    total       = db.Column(db.Float,       nullable=False)
-    status      = db.Column(db.String(20),  nullable=False, default="Pending")
-    notes       = db.Column(db.Text,        nullable=True)
-    created_at  = db.Column(db.DateTime,    default=datetime.utcnow)
-    updated_at  = db.Column(db.DateTime,    default=datetime.utcnow, onupdate=datetime.utcnow)
+    id         = db.Column(db.Integer, primary_key=True)
+    name       = db.Column(db.String(100), nullable=False)
+    phone      = db.Column(db.String(20),  nullable=False)
+    line1      = db.Column(db.String(120), nullable=False)
+    line2      = db.Column(db.String(120), nullable=True)
+    city       = db.Column(db.String(60),  nullable=False)
+    state      = db.Column(db.String(60),  nullable=False)
+    pin        = db.Column(db.String(12),  nullable=False)
+    landmark   = db.Column(db.String(100), nullable=True)
+    total      = db.Column(db.Float,       nullable=False)
+    status     = db.Column(db.String(20),  nullable=False, default="Pending")
+    notes      = db.Column(db.Text,        nullable=True)
+    created_at = db.Column(db.DateTime,    default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime,    default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationship
     items = db.relationship("OrderItem", backref="order", cascade="all, delete-orphan")
 
     def to_dict(self):

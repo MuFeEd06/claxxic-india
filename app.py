@@ -1,11 +1,12 @@
 """
-Claxxic India — Flask Backend (Phase 2 + Product Editor + Offer Ribbon)
+Claxxic India — Flask Backend (Supabase Edition)
+Products, offer banner, and orders all stored in Supabase PostgreSQL.
 """
 
 from flask import (Flask, jsonify, render_template, request,
                    abort, session, redirect, url_for)
 from flask_cors import CORS
-from models import db, Order, OrderItem
+from models import db, Product, Setting, Order, OrderItem
 import json, os, copy, re
 from datetime import datetime
 from functools import wraps
@@ -15,19 +16,23 @@ app = Flask(__name__)
 CORS(app)
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR      = os.path.join(BASE_DIR, "data")
-STATIC_DIR    = os.path.join(BASE_DIR, "static")
-PRODUCTS_FILE = os.path.join(DATA_DIR, "products.json")
-OFFER_FILE    = os.path.join(DATA_DIR, "offer.json")
+BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
-app.config["SQLALCHEMY_DATABASE_URI"]        = f"sqlite:///{os.path.join(DATA_DIR, 'claxxic.db')}"
+# Supabase connection — set DATABASE_URL in Render environment variables
+DATABASE_URL = os.environ.get("DATABASE_URL", "")
+# Supabase/Render give postgres:// but SQLAlchemy needs postgresql://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"]        = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"]      = {"pool_pre_ping": True}
 app.config["SECRET_KEY"]                     = os.environ.get("SECRET_KEY", "claxxic-secret-2026")
-app.config["MAX_CONTENT_LENGTH"]             = 5 * 1024 * 1024  # 5MB max upload
+app.config["MAX_CONTENT_LENGTH"]             = 5 * 1024 * 1024  # 5 MB
 
-ADMIN_PASSWORD  = os.environ.get("ADMIN_PASSWORD", "claxxic@admin")
-ALLOWED_EXT     = {"png", "jpg", "jpeg", "webp"}
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "claxxic@admin")
+ALLOWED_EXT    = {"png", "jpg", "jpeg", "webp"}
 
 db.init_app(app)
 with app.app_context():
@@ -36,34 +41,33 @@ with app.app_context():
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
 
-def load_products():
-    with open(PRODUCTS_FILE, "r") as f:
-        return json.load(f)
+def get_offer():
+    """Load offer settings from DB, with safe defaults."""
+    row = Setting.query.get("offer")
+    if row:
+        try:
+            return json.loads(row.value)
+        except Exception:
+            pass
+    return {"active": False, "text": "", "bg_color": "#FF6B35", "text_color": "#ffffff"}
 
-def save_products(products):
-    with open(PRODUCTS_FILE, "w") as f:
-        json.dump(products, f, indent=2, ensure_ascii=False)
+def set_offer(data):
+    row = Setting.query.get("offer")
+    if row:
+        row.value = json.dumps(data)
+    else:
+        db.session.add(Setting(key="offer", value=json.dumps(data)))
+    db.session.commit()
 
-def load_offer():
-    try:
-        with open(OFFER_FILE, "r") as f:
-            return json.load(f)
-    except:
-        return {"active": False, "text": "", "bg_color": "#FF6B35", "text_color": "#ffffff"}
-
-def save_offer(data):
-    with open(OFFER_FILE, "w") as f:
-        json.dump(data, f, indent=2)
-
-def fix_image_paths(products):
-    result = copy.deepcopy(products)
+def fix_image_paths(products_list):
+    """Ensure image URLs start with /static/"""
+    result = copy.deepcopy(products_list)
     for p in result:
         if p.get("image") and not p["image"].startswith(("/static/", "http")):
             p["image"] = "/static/" + p["image"]
-        if p.get("colors"):
-            for c in p["colors"]:
-                if c.get("image") and not c["image"].startswith(("/static/", "http")):
-                    c["image"] = "/static/" + c["image"]
+        for c in p.get("colors", []):
+            if c.get("image") and not c["image"].startswith(("/static/", "http")):
+                c["image"] = "/static/" + c["image"]
     return result
 
 def allowed_file(filename):
@@ -127,10 +131,10 @@ def admin_logout():
 @admin_required
 def admin_dashboard():
     status_filter = request.args.get("status", "all")
-    orders = Order.query.order_by(Order.created_at.desc())
+    query = Order.query.order_by(Order.created_at.desc())
     if status_filter != "all":
-        orders = orders.filter_by(status=status_filter)
-    orders = orders.all()
+        query = query.filter_by(status=status_filter)
+    orders = query.all()
 
     all_orders   = Order.query.all()
     total_orders = len(all_orders)
@@ -145,7 +149,7 @@ def admin_dashboard():
         confirmed     = Order.query.filter_by(status="Confirmed").count(),
         shipped       = Order.query.filter_by(status="Shipped").count(),
         delivered     = Order.query.filter_by(status="Delivered").count(),
-        offer         = load_offer(),
+        offer         = get_offer(),
     )
 
 
@@ -154,12 +158,12 @@ def admin_dashboard():
 @app.route("/admin/products")
 @admin_required
 def admin_products():
-    products = load_products()
+    products = [p.to_dict() for p in Product.query.order_by(Product.brand, Product.name).all()]
     brands   = sorted(set(p["brand"] for p in products))
     return render_template("admin_products.html",
         products = products,
         brands   = brands,
-        offer    = load_offer(),
+        offer    = get_offer(),
     )
 
 
@@ -167,50 +171,59 @@ def admin_products():
 
 @app.route("/api/products")
 def get_products():
-    products  = load_products()
+    query     = Product.query
     brand     = request.args.get("brand")
     tag       = request.args.get("tag")
     min_price = request.args.get("min_price", type=int)
     max_price = request.args.get("max_price", type=int)
     search    = request.args.get("q", "").lower().strip()
 
-    if brand:     products = [p for p in products if p["brand"].lower() == brand.lower()]
-    if tag:       products = [p for p in products if p.get("tag") == tag]
-    if min_price: products = [p for p in products if p["price"] >= min_price]
-    if max_price: products = [p for p in products if p["price"] <= max_price]
-    if search:    products = [p for p in products if search in p["name"].lower() or search in p["brand"].lower()]
+    if brand:     query = query.filter(db.func.lower(Product.brand) == brand.lower())
+    if tag:       query = query.filter(Product.tag == tag)
+    if min_price: query = query.filter(Product.price >= min_price)
+    if max_price: query = query.filter(Product.price <= max_price)
+    if search:
+        query = query.filter(
+            db.or_(
+                Product.name.ilike(f"%{search}%"),
+                Product.brand.ilike(f"%{search}%")
+            )
+        )
 
+    products = [p.to_dict() for p in query.all()]
     return jsonify(fix_image_paths(products))
 
 @app.route("/api/products/trending")
 def get_trending():
-    return jsonify(fix_image_paths([p for p in load_products() if p.get("tag") == "trending"]))
+    products = [p.to_dict() for p in Product.query.filter_by(tag="trending").all()]
+    return jsonify(fix_image_paths(products))
 
 @app.route("/api/products/<int:product_id>")
 def get_product(product_id):
-    product = next((p for p in load_products() if p["id"] == product_id), None)
+    product = Product.query.get(product_id)
     if not product:
         abort(404)
-    return jsonify(fix_image_paths([product])[0])
+    return jsonify(fix_image_paths([product.to_dict()])[0])
 
 @app.route("/api/brands")
 def get_brands():
-    brand_map = {}
-    for p in load_products():
-        brand_map[p["brand"]] = brand_map.get(p["brand"], 0) + 1
-    return jsonify([{"name": b, "count": c} for b, c in brand_map.items()])
+    from sqlalchemy import func
+    rows = db.session.query(Product.brand, func.count(Product.id)).group_by(Product.brand).all()
+    return jsonify([{"name": brand, "count": count} for brand, count in rows])
 
 @app.route("/api/search")
 def search_products():
     q = request.args.get("q", "").lower().strip()
     if not q:
         return jsonify([])
-    return jsonify(fix_image_paths([p for p in load_products()
-                                    if q in p["name"].lower() or q in p["brand"].lower()]))
+    products = Product.query.filter(
+        db.or_(Product.name.ilike(f"%{q}%"), Product.brand.ilike(f"%{q}%"))
+    ).all()
+    return jsonify(fix_image_paths([p.to_dict() for p in products]))
 
 @app.route("/api/offer")
-def get_offer():
-    return jsonify(load_offer())
+def api_get_offer():
+    return jsonify(get_offer())
 
 
 # ── API — PRODUCTS CRUD (admin) ───────────────────────────────────────────────
@@ -218,74 +231,64 @@ def get_offer():
 @app.route("/api/admin/products", methods=["POST"])
 @admin_required
 def api_add_product():
-    """Add a new product"""
-    data     = request.get_json(force=True)
-    products = load_products()
-    new_id   = max((p["id"] for p in products), default=0) + 1
+    data = request.get_json(force=True)
 
-    product = {
-        "id":     new_id,
-        "name":   data.get("name", "").strip(),
-        "brand":  data.get("brand", "").strip(),
-        "price":  int(data.get("price", 0)),
-        "image":  data.get("image", ""),
-        "sizes":  data.get("sizes", []),
-        "tag":    data.get("tag", ""),
-        "colors": data.get("colors", []),
-    }
+    name  = data.get("name",  "").strip()
+    brand = data.get("brand", "").strip()
+    price = int(data.get("price", 0))
 
-    if not product["name"] or not product["brand"] or not product["price"]:
+    if not name or not brand or not price:
         return jsonify({"error": "name, brand and price are required"}), 400
 
-    products.append(product)
-    save_products(products)
-    return jsonify({"success": True, "product": product}), 201
+    product = Product(
+        name   = name,
+        brand  = brand,
+        price  = price,
+        image  = data.get("image", ""),
+        tag    = data.get("tag", ""),
+        sizes  = json.dumps(data.get("sizes", [])),
+        colors = json.dumps(data.get("colors", [])),
+    )
+    db.session.add(product)
+    db.session.commit()
+    return jsonify({"success": True, "product": product.to_dict()}), 201
 
 
 @app.route("/api/admin/products/<int:product_id>", methods=["PUT"])
 @admin_required
 def api_update_product(product_id):
-    """Update an existing product"""
-    data     = request.get_json(force=True)
-    products = load_products()
-    idx      = next((i for i, p in enumerate(products) if p["id"] == product_id), None)
-
-    if idx is None:
+    product = Product.query.get(product_id)
+    if not product:
         return jsonify({"error": "Product not found"}), 404
 
-    p = products[idx]
-    p["name"]   = data.get("name",   p["name"])
-    p["brand"]  = data.get("brand",  p["brand"])
-    p["price"]  = int(data.get("price", p["price"]))
-    p["image"]  = data.get("image",  p["image"])
-    p["sizes"]  = data.get("sizes",  p["sizes"])
-    p["tag"]    = data.get("tag",    p.get("tag", ""))
-    p["colors"] = data.get("colors", p.get("colors", []))
+    data = request.get_json(force=True)
+    product.name   = data.get("name",   product.name)
+    product.brand  = data.get("brand",  product.brand)
+    product.price  = int(data.get("price", product.price))
+    product.image  = data.get("image",  product.image)
+    product.tag    = data.get("tag",    product.tag or "")
+    product.sizes  = json.dumps(data.get("sizes",  json.loads(product.sizes  or "[]")))
+    product.colors = json.dumps(data.get("colors", json.loads(product.colors or "[]")))
 
-    products[idx] = p
-    save_products(products)
-    return jsonify({"success": True, "product": p})
+    db.session.commit()
+    return jsonify({"success": True, "product": product.to_dict()})
 
 
 @app.route("/api/admin/products/<int:product_id>", methods=["DELETE"])
 @admin_required
 def api_delete_product(product_id):
-    """Delete a product"""
-    products = load_products()
-    original = len(products)
-    products = [p for p in products if p["id"] != product_id]
-
-    if len(products) == original:
+    product = Product.query.get(product_id)
+    if not product:
         return jsonify({"error": "Product not found"}), 404
 
-    save_products(products)
+    db.session.delete(product)
+    db.session.commit()
     return jsonify({"success": True})
 
 
 @app.route("/api/admin/upload-image", methods=["POST"])
 @admin_required
 def api_upload_image():
-    """Upload a product image — saves to static/shoes/<brand_slug>/"""
     if "image" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
 
@@ -320,7 +323,7 @@ def api_save_offer():
         "bg_color":   data.get("bg_color", "#FF6B35"),
         "text_color": data.get("text_color", "#ffffff"),
     }
-    save_offer(offer)
+    set_offer(offer)
     return jsonify({"success": True, "offer": offer})
 
 
@@ -338,21 +341,25 @@ def create_order():
 
     try:
         order = Order(
-            name=addr.get("name",""), phone=addr.get("phone",""),
-            line1=addr.get("line1",""), line2=addr.get("line2",""),
-            city=addr.get("city",""), state=addr.get("state",""),
-            pin=addr.get("pin",""), landmark=addr.get("landmark",""),
-            total=total, status="Pending",
+            name=addr.get("name",""),     phone=addr.get("phone",""),
+            line1=addr.get("line1",""),   line2=addr.get("line2",""),
+            city=addr.get("city",""),     state=addr.get("state",""),
+            pin=addr.get("pin",""),       landmark=addr.get("landmark",""),
+            total=total,                  status="Pending",
         )
         db.session.add(order)
         db.session.flush()
 
         for item in items:
             db.session.add(OrderItem(
-                order_id=order.id, product_id=item.get("id",0),
-                name=item.get("name",""), brand=item.get("brand",""),
-                size=item.get("size",""), color=item.get("color",""),
-                qty=item.get("qty",1), price=item.get("price",0),
+                order_id=order.id,
+                product_id=item.get("id", 0),
+                name=item.get("name",""),
+                brand=item.get("brand",""),
+                size=item.get("size",""),
+                color=item.get("color",""),
+                qty=item.get("qty", 1),
+                price=item.get("price", 0),
                 image=item.get("image",""),
             ))
 
@@ -368,9 +375,9 @@ def create_order():
 def update_order_status(order_id):
     order      = Order.query.get_or_404(order_id)
     new_status = request.get_json(force=True).get("status")
-    valid      = ["Pending","Confirmed","Shipped","Delivered","Cancelled"]
+    valid      = ["Pending", "Confirmed", "Shipped", "Delivered", "Cancelled"]
     if new_status not in valid:
-        return jsonify({"error": f"Invalid status"}), 400
+        return jsonify({"error": "Invalid status"}), 400
     order.status     = new_status
     order.updated_at = datetime.utcnow()
     db.session.commit()
