@@ -356,8 +356,8 @@
             </div>
             <div class="card-actions">
                 <button class="edit-btn"
-                        data-product="{{ p | tojson | e }}"
-                        onclick="openEditModal(JSON.parse(this.dataset.product))">✏️ Edit</button>
+                        data-id="{{ p.id }}"
+                        onclick="editById({{ p.id }})">✏️ Edit</button>
                 <button class="delete-btn"
                         data-id="{{ p.id }}"
                         data-name="{{ p.name | e }}"
@@ -442,6 +442,19 @@
 <div id="toast"></div>
 
 <script>
+/* ── PRODUCT DATA MAP (server-rendered, safe) ── */
+const PRODUCT_MAP = {
+    {% for p in products %}
+    {{ p.id }}: {{ p | tojson }},
+    {% endfor %}
+};
+
+function editById(id) {
+    const product = PRODUCT_MAP[id];
+    if (!product) { showToast("Product not found", false); return; }
+    openEditModal(product);
+}
+
 /* ── STATE ── */
 let editingId   = null;
 let currentBrand = "";
