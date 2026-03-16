@@ -470,7 +470,7 @@ function updateOfferPreview() {
     const preview = document.getElementById("offer-preview");
     const label   = document.getElementById("offer-toggle-label");
 
-    label.textContent      = active ? "ON" : "OFF";
+    label.textContent        = active ? "ON" : "OFF";
     preview.style.background = bg;
     preview.style.color      = fg;
     preview.textContent      = text || "Preview will appear here";
@@ -489,13 +489,24 @@ async function saveOffer() {
         bg_color:   document.getElementById("offer-bg").value,
         text_color: document.getElementById("offer-fg").value,
     };
-    const res  = await fetch("/api/admin/offer", {
-        method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (data.success) showToast(payload.active && payload.text ? "✅ Ribbon is now LIVE on homepage!" : "✅ Ribbon saved (currently off)");
-    else showToast("Failed to save", false);
+    try {
+        const res  = await fetch("/api/admin/offer", {
+            method: "POST",
+            credentials: "include",   /* ← FIXES session cookie not being sent */
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        });
+        if (res.redirected) {
+            showToast("Session expired — please log in again", false);
+            setTimeout(() => window.location.href = "/admin", 1500);
+            return;
+        }
+        const data = await res.json();
+        if (data.success) showToast(payload.active && payload.text ? "✅ Ribbon is now LIVE on homepage!" : "✅ Ribbon saved (currently off)");
+        else showToast(data.error || "Failed to save", false);
+    } catch(e) {
+        showToast("Network error — try again", false);
+    }
 }
 
 /* ── MODAL OPEN/CLOSE ── */
@@ -550,8 +561,8 @@ function resetForm() {
     ["f-name","f-brand","f-price","f-image"].forEach(id => {
         document.getElementById(id).value = "";
     });
-    document.getElementById("f-tag").value          = "";
-    document.getElementById("f-image-path").textContent = "";
+    document.getElementById("f-tag").value               = "";
+    document.getElementById("f-image-path").textContent  = "";
     document.getElementById("f-image-preview").style.display = "none";
     document.querySelectorAll(".size-chip").forEach(c => c.classList.remove("selected"));
     document.getElementById("colors-list").innerHTML = "";
@@ -578,18 +589,30 @@ async function uploadMainImage(input) {
     form.append("brand", brand);
 
     showToast("Uploading...", true);
-    const res  = await fetch("/api/admin/upload-image", { method: "POST", body: form });
-    const data = await res.json();
-
-    if (data.success) {
-        document.getElementById("f-image").value     = data.path;
-        document.getElementById("f-image-path").textContent = data.path;
-        const prev = document.getElementById("f-image-preview");
-        prev.src   = data.url;
-        prev.style.display = "block";
-        showToast("✅ Image uploaded!");
-    } else {
-        showToast(data.error || "Upload failed", false);
+    try {
+        const res  = await fetch("/api/admin/upload-image", {
+            method: "POST",
+            credentials: "include",   /* ← FIXES session cookie */
+            body: form
+        });
+        if (res.redirected) {
+            showToast("Session expired — please log in again", false);
+            setTimeout(() => window.location.href = "/admin", 1500);
+            return;
+        }
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById("f-image").value            = data.path;
+            document.getElementById("f-image-path").textContent = data.path;
+            const prev = document.getElementById("f-image-preview");
+            prev.src   = data.url;
+            prev.style.display = "block";
+            showToast("✅ Image uploaded!");
+        } else {
+            showToast(data.error || "Upload failed", false);
+        }
+    } catch(e) {
+        showToast("Upload failed — network error", false);
     }
 }
 
@@ -603,18 +626,18 @@ function addColorRow(data = {}) {
     row.className = "color-row";
     row.id        = `color-row-${id}`;
     row.innerHTML = `
-        <input type="color" value="${data.hex || "#2B9FD8'}"
+        <input type="color" value="${data.hex || '#2B9FD8'}"
                id="cr-hex-${id}" title="Pick color">
-        <input type="text"  value="${data.name || ""}"
+        <input type="text"  value="${data.name || ''}"
                id="cr-name-${id}" placeholder="Color name">
-        <input type="number" value="${data.price || ""}"
+        <input type="number" value="${data.price || ''}"
                id="cr-price-${id}" placeholder="Price (₹)">
-        <label class="color-img-btn" title="${data.image || "No image"}">
-            ${data.image ? "✅ Image" : "📷 Image"}
+        <label class="color-img-btn" title="${data.image || 'No image'}">
+            ${data.image ? '✅ Image' : '📷 Image'}
             <input type="file" accept="image/*"
                    onchange="uploadColorImage(this, ${id})">
         </label>
-        <input type="hidden" id="cr-img-${id}" value="${data.image || ""}">
+        <input type="hidden" id="cr-img-${id}" value="${data.image || ''}">
         <button type="button" class="color-del-btn"
                 onclick="document.getElementById('color-row-${id}').remove()">✕</button>
     `;
@@ -630,15 +653,26 @@ async function uploadColorImage(input, rowId) {
     form.append("image", file);
     form.append("brand", brand);
 
-    const res  = await fetch("/api/admin/upload-image", { method: "POST", body: form });
-    const data = await res.json();
-
-    if (data.success) {
-        document.getElementById(`cr-img-${rowId}`).value = data.path;
-        input.parentElement.textContent = "✅ Image";
-        showToast("Color image uploaded!");
-    } else {
-        showToast(data.error || "Upload failed", false);
+    try {
+        const res  = await fetch("/api/admin/upload-image", {
+            method: "POST",
+            credentials: "include",   /* ← FIXES session cookie */
+            body: form
+        });
+        if (res.redirected) {
+            showToast("Session expired — please log in again", false);
+            return;
+        }
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById(`cr-img-${rowId}`).value = data.path;
+            input.parentElement.innerHTML = `✅ Image<input type="file" accept="image/*" onchange="uploadColorImage(this, ${rowId})">`;
+            showToast("Color image uploaded!");
+        } else {
+            showToast(data.error || "Upload failed", false);
+        }
+    } catch(e) {
+        showToast("Upload failed", false);
     }
 }
 
@@ -675,18 +709,28 @@ async function saveProduct() {
     const url    = editingId ? `/api/admin/products/${editingId}` : "/api/admin/products";
     const method = editingId ? "PUT" : "POST";
 
-    const res  = await fetch(url, {
-        method, headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-
-    if (data.success || data.product) {
-        showToast(editingId ? "✅ Product updated!" : "✅ Product added!");
-        closeModal();
-        setTimeout(() => location.reload(), 800);
-    } else {
-        showToast(data.error || "Failed to save", false);
+    try {
+        const res  = await fetch(url, {
+            method,
+            credentials: "include",   /* ← FIXES session cookie */
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        });
+        if (res.redirected) {
+            showToast("Session expired — please log in again", false);
+            setTimeout(() => window.location.href = "/admin", 1500);
+            return;
+        }
+        const data = await res.json();
+        if (data.success || data.product) {
+            showToast(editingId ? "✅ Product updated!" : "✅ Product added!");
+            closeModal();
+            setTimeout(() => location.reload(), 800);
+        } else {
+            showToast(data.error || "Failed to save", false);
+        }
+    } catch(e) {
+        showToast("Network error — try again", false);
     }
 }
 
@@ -694,14 +738,25 @@ async function saveProduct() {
 async function deleteProduct(id, name) {
     if (!confirm(`Delete "${name}"?\n\nThis cannot be undone.`)) return;
 
-    const res  = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
-    const data = await res.json();
-
-    if (data.success) {
-        showToast("🗑 Product deleted");
-        document.querySelector(`.product-card[data-id="${id}"]`)?.remove();
-    } else {
-        showToast(data.error || "Failed to delete", false);
+    try {
+        const res  = await fetch(`/api/admin/products/${id}`, {
+            method: "DELETE",
+            credentials: "include"    /* ← FIXES session cookie */
+        });
+        if (res.redirected) {
+            showToast("Session expired — please log in again", false);
+            setTimeout(() => window.location.href = "/admin", 1500);
+            return;
+        }
+        const data = await res.json();
+        if (data.success) {
+            showToast("🗑 Product deleted");
+            document.querySelector(`.product-card[data-id="${id}"]`)?.remove();
+        } else {
+            showToast(data.error || "Failed to delete", false);
+        }
+    } catch(e) {
+        showToast("Network error — try again", false);
     }
 }
 </script>
