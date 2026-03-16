@@ -355,8 +355,13 @@
                 <div class="card-sizes">{{ p.sizes | join(", ") }}</div>
             </div>
             <div class="card-actions">
-                <button class="edit-btn" onclick="openEditModal({{ p | tojson }})">✏️ Edit</button>
-                <button class="delete-btn" onclick="deleteProduct({{ p.id }}, '{{ p.name }}')">🗑</button>
+                <button class="edit-btn"
+                        data-product="{{ p | tojson | e }}"
+                        onclick="openEditModal(JSON.parse(this.dataset.product))">✏️ Edit</button>
+                <button class="delete-btn"
+                        data-id="{{ p.id }}"
+                        data-name="{{ p.name | e }}"
+                        onclick="deleteProduct(this.dataset.id, this.dataset.name)">🗑</button>
             </div>
         </div>
         {% endfor %}
